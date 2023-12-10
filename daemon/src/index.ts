@@ -5,6 +5,10 @@ import setupRabbitMQ from "./rabbitmq/setup.js";
 // Loads .env data
 dotenv.config();
 
+// Check if secret is present in env
+const secret = process.env.METER_SECRET;
+if (!secret) throw new Error("Meter secret not defined in .env");
+
 // Connect to db
 console.log("Attempting to connect to mongodb...");
 const mongoUri = process.env.MONGO_URI
