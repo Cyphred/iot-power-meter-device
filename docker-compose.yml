@@ -25,6 +25,20 @@ services:
     networks:
       - redis
 
+  api:
+    container_name: iotpc_api
+    build: ./device_api
+    ports:
+      - 8000:8000
+    depends_on:
+      - mongodb
+      - redis
+    volumes:
+      - ./device_api:/app/api/
+    networks:
+      - redis
+      - mongodb
+
 networks:
   mongodb:
     driver: bridge
