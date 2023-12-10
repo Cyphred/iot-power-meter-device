@@ -2,6 +2,7 @@ import amqp, { Connection } from "amqplib";
 import messageChannels from "./channels.js";
 import startConsumer from "./startConsumer.js";
 import IRawConsumption from "../types/rawConsumption.js";
+import handleNewRawConsumptionData from "../events/newRawConsumptionData.js";
 
 /**
  * Attempts to connect to a RabbitMQ server via a connection string.
@@ -51,7 +52,7 @@ const startDataPointConsumer = async (connection: Connection) => {
     messageChannels.CONSUMPTION_DATA,
     true,
     (payload: IRawConsumption) => {
-      // TODO Handle incoming raw data
+      handleNewRawConsumptionData(payload);
     }
   );
 };
