@@ -1,13 +1,15 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 
-interface IConsumptionFrame {
+export interface IConsumptionFrame {
   start: Date;
   end: Date;
   consumption: Number;
   sent?: Date;
 }
 
-interface IConsumptionFrameDocument extends IConsumptionFrame, Document {}
+export interface IConsumptionFrameDocument
+  extends IConsumptionFrame,
+    Document {}
 
 const consumptionFrameSchema: Schema<IConsumptionFrameDocument> =
   new Schema<IConsumptionFrameDocument>({
