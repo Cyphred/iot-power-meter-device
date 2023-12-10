@@ -1,4 +1,4 @@
-import mongoose, { Schema, Types, Document, Model } from "mongoose";
+import mongoose, { Schema, Document, Model } from "mongoose";
 
 interface IConsumptionFrame {
   start: Date;
