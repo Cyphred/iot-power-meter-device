@@ -25,14 +25,14 @@ services:
     networks:
       - redis
 
-  api:
-    container_name: iotpc_api
-    build: ./device_api
+  main:
+    container_name: iotpc_daemon
+    build: ./daemon
     depends_on:
       - mongodb
       - redis
     volumes:
-      - ./device_api:/app/api/
+      - ./daemon:/app/daemon/
     networks:
       - redis
       - mongodb

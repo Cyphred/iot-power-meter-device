@@ -1,5 +1,5 @@
 {
-  "name": "iot_power_company_meter_api",
+  "name": "iotpc_daemon",
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
