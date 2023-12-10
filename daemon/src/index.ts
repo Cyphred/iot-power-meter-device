@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import setupRabbitMQ from "./rabbitmq/setup.js";
+import sendDataToServer from "./jobs/sendDataToServer.js";
 
 // Loads .env data
 dotenv.config();
@@ -17,4 +18,8 @@ const mongoUri = process.env.MONGO_URI
 await mongoose.connect(mongoUri);
 console.log(`Connected to mongodb at ${mongoUri}`);
 
+// Setup rabbitmq
 await setupRabbitMQ();
+
+// Start sending data to the server reqularly
+sendDataToServer.invoke();

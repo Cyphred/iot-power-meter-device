@@ -2,10 +2,11 @@ import axios from "axios";
 import ConsumptionFrameModel from "../models/consumptionFrame.js";
 import dotenv from "dotenv";
 import { Types } from "mongoose";
+import schedule from "node-schedule";
 
 dotenv.config();
 
-export const sendUnsentReportsToServer = async () => {
+const sendUnsentReportsToServer = async () => {
   console.log("Checking for unsent reports...");
 
   const reports = await ConsumptionFrameModel.find({ sent: false });
@@ -26,7 +27,7 @@ export const sendUnsentReportsToServer = async () => {
       { headers: { Authorization: process.env.METER_SECRET } }
     );
   } catch (err) {
-    console.error(err);
+    console.error("Could not send reports to the server");
   }
 
   // Update local report data
@@ -40,6 +41,10 @@ export const sendUnsentReportsToServer = async () => {
       { sent: now }
     );
   } catch (err) {
-    console.error(err);
+    console.error("Could not update the consumption frames");
   }
 };
+
+export default schedule.scheduleJob("*/30 * * * * *", (fireDate) => {
+  sendUnsentReportsToServer();
+});
