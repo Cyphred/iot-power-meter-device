@@ -25,20 +25,43 @@ services:
     networks:
       - redis
 
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: iotpc_rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+    environment:
+      RABBITMQ_DEFAULT_USER: iotpc_admin
+      RABBITMQ_DEFAULT_PASS: iotpc_admin
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq/
+      - rabbitmq-log:/var/log/rabbbitmq
+    networks:
+      - rabbitmq
+
   main:
     container_name: iotpc_daemon
     build: ./daemon
     depends_on:
-      - mongodb
       - redis
+      - mongodb
+      - rabbitmq
     volumes:
       - ./daemon:/app/daemon/
     networks:
       - redis
       - mongodb
+      - rabbitmq
 
 networks:
   mongodb:
     driver: bridge
   redis:
     driver: bridge
+  rabbitmq:
+    driver: bridge
+
+volumes:
+  rabbitmq-data:
+  rabbitmq-log:
