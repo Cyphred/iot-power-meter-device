@@ -1,5 +1,8 @@
 import axios from "axios";
-import ConsumptionFrameModel from "../models/consumptionFrame.js";
+import ConsumptionFrameModel, {
+  IConsumptionFrame,
+  IConsumptionFrameDocument,
+} from "../models/consumptionFrame.js";
 import dotenv from "dotenv";
 import { Types } from "mongoose";
 import schedule from "node-schedule";
@@ -9,15 +12,25 @@ dotenv.config();
 const sendUnsentReportsToServer = async () => {
   console.log("Checking for unsent reports...");
 
-  const reports = await ConsumptionFrameModel.find({ sent: false });
+  let reports: IConsumptionFrameDocument[] = [];
+
+  try {
+    reports = await ConsumptionFrameModel.find({
+      $or: [{ sent: { $exists: false } }, { sent: { $eq: null } }],
+    });
+
+    console.log(`Found ${reports.length} unsent reports`);
+    console.log(reports);
+  } catch (err) {
+    console.log("No reports to send.");
+    return;
+  }
 
   // Do not proceed if there are no reports to be sent
   if (reports.length === 0) {
     console.log("No reports to send.");
     return;
   }
-
-  console.log(`Found ${reports.length} unsent reports.`);
 
   // Send report data to the backend
   try {
@@ -28,6 +41,7 @@ const sendUnsentReportsToServer = async () => {
     );
   } catch (err) {
     console.error("Could not send reports to the server");
+    return;
   }
 
   // Update local report data
@@ -42,6 +56,7 @@ const sendUnsentReportsToServer = async () => {
     );
   } catch (err) {
     console.error("Could not update the consumption frames");
+    return;
   }
 };
 
