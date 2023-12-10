@@ -28,8 +28,6 @@ services:
   api:
     container_name: iotpc_api
     build: ./device_api
-    ports:
-      - 8000:8000
     depends_on:
       - mongodb
       - redis
