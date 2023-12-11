@@ -4,6 +4,7 @@ import ConsumptionFrameModel, {
 } from "../models/consumptionFrame.js";
 import dotenv from "dotenv";
 import { Types } from "mongoose";
+import getRedisClient from "../util/getRedisClient.js";
 
 dotenv.config();
 
@@ -38,6 +39,9 @@ export default async () => {
       { headers: { Authorization: process.env.METER_SECRET } }
     );
   } catch (err) {
+    const redisClient = await getRedisClient();
+    await redisClient.set("SERVER_ONLINE", 0);
+    await redisClient.quit();
     console.error("Could not send reports to the server");
     return;
   }
