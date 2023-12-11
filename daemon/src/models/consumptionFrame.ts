@@ -1,4 +1,5 @@
-import mongoose, { Schema, Document, Model } from "mongoose";
+import { DataTypes } from "sequelize";
+import sequelize from "../sequelize.js";
 
 export interface IConsumptionFrame {
   start: Date;
@@ -7,44 +8,39 @@ export interface IConsumptionFrame {
   sent?: Date;
 }
 
-export interface IConsumptionFrameDocument
-  extends IConsumptionFrame,
-    Document {}
+export interface IConsumptionFrameRecord extends IConsumptionFrame {
+  id: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
-const consumptionFrameSchema: Schema<IConsumptionFrameDocument> =
-  new Schema<IConsumptionFrameDocument>({
+const ConsumptionFrame = sequelize.define(
+  "ConsumptionFrame",
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      allowNull: false,
+      primaryKey: true,
+    },
     start: {
-      type: Date,
-      required: true,
+      type: DataTypes.DATE,
+      allowNull: false,
     },
     end: {
-      type: Date,
-      required: true,
+      type: DataTypes.DATE,
+      allowNull: false,
     },
     consumption: {
-      type: Number,
-      required: true,
-      validate: {
-        validator: (consumption: number) => consumption >= 0,
-        message: "Consumption cannot be a negative number",
-      },
+      type: DataTypes.FLOAT,
+      allowNull: false,
     },
     sent: {
-      type: Date,
+      type: DataTypes.DATE,
+      allowNull: true,
     },
-  });
+  },
+  { tableName: "ConsumptionFrames", timestamps: true }
+);
 
-consumptionFrameSchema.pre("validate", function (next) {
-  if (this.start > this.end)
-    next(new Error("Start time must be earlier than the end time"));
-
-  next();
-});
-
-const ConsumptionFrameModel: Model<IConsumptionFrameDocument> =
-  mongoose.model<IConsumptionFrameDocument>(
-    "ConsumptionFrame",
-    consumptionFrameSchema
-  );
-
-export default ConsumptionFrameModel;
+export default ConsumptionFrame;

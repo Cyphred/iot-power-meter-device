@@ -1,4 +1,5 @@
-import mongoose, { Schema, Document, Model } from "mongoose";
+import { DataTypes } from "sequelize";
+import sequelize from "../sequelize.js";
 
 const eventTypes = {
   METER_POWER_ON: "METER_POWER_ON",
@@ -13,28 +14,35 @@ const eventTypes = {
 type EventType = (typeof eventTypes)[keyof typeof eventTypes];
 
 export interface IEventReport {
-  timestamp: Date;
   event: EventType;
   remarks?: string;
 }
 
-export interface IEventReportDocument extends IEventReport, Document {}
+export interface IEventReportRecord extends IEventReport {
+  id: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
-const eventReportSchema: Schema<IEventReportDocument> =
-  new Schema<IEventReportDocument>({
-    timestamp: {
-      type: Date,
-      required: true,
+const EventReport = sequelize.define(
+  "EventReport",
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      allowNull: false,
+      primaryKey: true,
     },
     event: {
-      type: String,
-      required: true,
-      enum: Object.values(eventTypes),
+      type: DataTypes.STRING,
+      allowNull: false,
     },
-    remarks: String,
-  });
+    remarks: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+  },
+  { tableName: "EventReports", timestamps: true }
+);
 
-const EventReportModel: Model<IEventReportDocument> =
-  mongoose.model<IEventReportDocument>("EventReport", eventReportSchema);
-
-export default EventReportModel;
+export default EventReport;
