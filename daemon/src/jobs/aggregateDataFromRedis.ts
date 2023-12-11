@@ -3,6 +3,7 @@ import { createClient } from "redis";
 import ConsumptionFrameModel, {
   IConsumptionFrame,
 } from "../models/consumptionFrame.js";
+import getRedisClient from "../util/getRedisClient.js";
 
 dotenv.config();
 
@@ -17,17 +18,7 @@ interface IParsedData {
 }
 
 export default async () => {
-  const redisClient = createClient({
-    password: process.env.REDIS_PASSWORD,
-    socket: {
-      host: process.env.REDIS_HOST,
-      port: parseInt(process.env.REDIS_PORT || "6379", 10),
-    },
-  });
-  redisClient.on("error", (err) => console.log("Redis Client Error", err));
-  await redisClient.connect();
-
-  const now = new Date();
+  const redisClient = await getRedisClient();
 
   // Store the keys of the data
   const keys = await redisClient.keys("key:*");
@@ -68,7 +59,7 @@ export default async () => {
   }
 
   // Close the redis connection
-  await redisClient.disconnect();
+  await redisClient.quit();
 };
 
 const convertToConsumptionFrames = async (parsedData: IParsedData[]) => {
