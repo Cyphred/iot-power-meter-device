@@ -106,9 +106,11 @@ void loop() {
     return;
 
   readCurrent();
-  Serial.print(RMSCurrent); // Sends the current reading via serial
-  Serial.print(',');
   Serial.print(relayOn);
+  Serial.print(',');
+  Serial.print(kilos); // Sends the watt hours reading via serial
+  Serial.print(',');
+  Serial.print(RMSCurrent); // Sends the current reading via serial
   Serial.println();
 
   // Update relay cut state
@@ -140,11 +142,12 @@ void readCurrent() {
   costing = kWh * traiff / 100.00; // Calculate the rough cost to run the heater
 
   if (timein > 10 & flag == false) {
-
+    /*
     Serial.print("TIME ");
     Serial.print(time);
     Serial.print(" , SECONDS:");
     Serial.println(timein, 0);
+    */
     flag = true;
   }
 }
