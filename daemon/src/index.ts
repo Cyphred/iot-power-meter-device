@@ -2,6 +2,8 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import setupRabbitMQ from "./rabbitmq/setup.js";
 import sendDataToServer from "./jobs/sendDataToServer.js";
+import aggregateDataFromRedis from "./jobs/aggregateDataFromRedis.js";
+import { scheduleJob } from "node-schedule";
 
 // Loads .env data
 dotenv.config();
@@ -21,5 +23,17 @@ console.log(`Connected to mongodb at ${mongoUri}`);
 // Setup rabbitmq
 await setupRabbitMQ();
 
-// Start sending data to the server reqularly
-sendDataToServer.invoke();
+const startScheduledJobs = () => {
+  const aggregateJob = scheduleJob("*/5 * * * * *", (fireDate) => {
+    aggregateDataFromRedis();
+  });
+
+  const sendJob = scheduleJob("*/30 * * * * *", (fireDate) => {
+    sendDataToServer();
+  });
+
+  aggregateJob.invoke();
+  sendJob.invoke();
+};
+
+startScheduledJobs();

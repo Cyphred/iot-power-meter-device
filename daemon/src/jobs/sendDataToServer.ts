@@ -1,15 +1,13 @@
 import axios from "axios";
 import ConsumptionFrameModel, {
-  IConsumptionFrame,
   IConsumptionFrameDocument,
 } from "../models/consumptionFrame.js";
 import dotenv from "dotenv";
 import { Types } from "mongoose";
-import schedule from "node-schedule";
 
 dotenv.config();
 
-const sendUnsentReportsToServer = async () => {
+export default async () => {
   console.log("Checking for unsent reports...");
 
   let reports: IConsumptionFrameDocument[] = [];
@@ -59,7 +57,3 @@ const sendUnsentReportsToServer = async () => {
     return;
   }
 };
-
-export default schedule.scheduleJob("*/30 * * * * *", (fireDate) => {
-  sendUnsentReportsToServer();
-});
