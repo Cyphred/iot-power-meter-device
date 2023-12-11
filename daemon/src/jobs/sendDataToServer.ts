@@ -18,7 +18,6 @@ export default async () => {
     });
 
     console.log(`Found ${reports.length} unsent reports`);
-    console.log(reports);
   } catch (err) {
     console.log("No reports to send.");
     return;
@@ -32,6 +31,7 @@ export default async () => {
 
   // Send report data to the backend
   try {
+    console.log("Sending reports to server...");
     await axios.post(
       `${process.env.REPORTS_URI}`,
       { reports },
