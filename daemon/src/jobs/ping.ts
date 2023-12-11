@@ -2,6 +2,7 @@ import axios from "axios";
 import dotenv from "dotenv";
 dotenv.config();
 import getRedisClient from "../util/getRedisClient.js";
+import IApiResponse from "../types/apiResponse.js";
 
 export default async () => {
   const redisClient = await getRedisClient();
@@ -20,11 +21,19 @@ export default async () => {
       { headers: { Authorization: process.env.METER_SECRET } }
     );
 
+    const responseData = response.data as IApiResponse;
+
     let connected = 0;
-    if (response.status === 200) connected = 1;
-    redisClient.set("SERVER_ONLINE", connected);
+    if (responseData.status === 200) connected = 1;
+
+    // If the load is supposed to be disconnected
+    if (responseData.body && responseData.body.loadConnected === false) {
+      await redisClient.set("LOAD_CONNECTED", 0);
+    }
+
+    await redisClient.set("SERVER_ONLINE", connected);
   } catch (err) {
-    redisClient.set("SERVER_ONLINE", 0);
+    await redisClient.set("SERVER_ONLINE", 0);
   } finally {
     await redisClient.quit();
   }
