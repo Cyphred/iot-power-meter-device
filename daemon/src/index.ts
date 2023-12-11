@@ -1,6 +1,5 @@
 import dotenv from "dotenv";
 import mongoose from "mongoose";
-import setupRabbitMQ from "./rabbitmq/setup.js";
 import sendDataToServer from "./jobs/sendDataToServer.js";
 import aggregateDataFromRedis from "./jobs/aggregateDataFromRedis.js";
 import { scheduleJob } from "node-schedule";
@@ -20,9 +19,6 @@ const mongoUri = process.env.MONGO_URI
   : "mongodb://mongodb:mongodb@127.0.0.1:27017";
 await mongoose.connect(mongoUri);
 console.log(`Connected to mongodb at ${mongoUri}`);
-
-// Setup rabbitmq
-await setupRabbitMQ();
 
 const startScheduledJobs = () => {
   const aggregateJob = scheduleJob("*/5 * * * * *", (fireDate) => {
