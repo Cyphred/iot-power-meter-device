@@ -1,10 +1,10 @@
-import { DataTypes } from "sequelize";
+import { DataTypes, Model } from "sequelize";
 import sequelize from "../sequelize.js";
 
 export interface IConsumptionFrame {
   start: Date;
   end: Date;
-  consumption: Number;
+  consumption: number;
   sent?: Date;
 }
 
@@ -14,8 +14,21 @@ export interface IConsumptionFrameRecord extends IConsumptionFrame {
   updatedAt: Date;
 }
 
-const ConsumptionFrame = sequelize.define(
-  "ConsumptionFrame",
+class ConsumptionFrame
+  extends Model<IConsumptionFrameRecord>
+  implements IConsumptionFrameRecord
+{
+  public id!: number;
+  public start!: Date;
+  public end!: Date;
+  public consumption!: number;
+  public sent!: Date;
+
+  public readonly createdAt!: Date;
+  public readonly updatedAt!: Date;
+}
+
+ConsumptionFrame.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -39,8 +52,23 @@ const ConsumptionFrame = sequelize.define(
       type: DataTypes.DATE,
       allowNull: true,
     },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
+    },
   },
-  { tableName: "ConsumptionFrames", timestamps: true }
+  {
+    sequelize,
+    modelName: "ConsumptionFrame",
+    tableName: "ConsumptionFrames",
+    timestamps: true,
+  }
 );
 
 export default ConsumptionFrame;
