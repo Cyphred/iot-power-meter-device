@@ -1,4 +1,4 @@
-import { DataTypes } from "sequelize";
+import { DataTypes, Model } from "sequelize";
 import sequelize from "../sequelize.js";
 
 const eventTypes = {
@@ -24,8 +24,19 @@ export interface IEventReportRecord extends IEventReport {
   updatedAt: Date;
 }
 
-const EventReport = sequelize.define(
-  "EventReport",
+class EventReport
+  extends Model<IEventReportRecord>
+  implements IEventReportRecord
+{
+  public id!: number;
+  public event!: EventType;
+  public remarks?: string;
+
+  public readonly createdAt!: Date;
+  public readonly updatedAt!: Date;
+}
+
+EventReport.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -41,8 +52,23 @@ const EventReport = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
+    },
   },
-  { tableName: "EventReports", timestamps: true }
+  {
+    sequelize,
+    modelName: "EventReport",
+    tableName: "EventReports",
+    timestamps: true,
+  }
 );
 
 export default EventReport;
