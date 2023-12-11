@@ -1,6 +1,9 @@
 # Data folder for database data
 data/
 
+# Redis store
+redis_st
+
 ### Start of python .gitignore
 
 # Byte-compiled / optimized / DLL files
