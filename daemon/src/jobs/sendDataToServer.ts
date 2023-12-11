@@ -1,21 +1,25 @@
 import axios from "axios";
-import ConsumptionFrameModel, {
-  IConsumptionFrameDocument,
+import ConsumptionFrame, {
+  IConsumptionFrameRecord,
 } from "../models/consumptionFrame.js";
 import dotenv from "dotenv";
-import { Types } from "mongoose";
 import getRedisClient from "../util/getRedisClient.js";
+import { Op } from "sequelize";
 
 dotenv.config();
 
 export default async () => {
   console.log("Checking for unsent reports...");
 
-  let reports: IConsumptionFrameDocument[] = [];
+  let reports: IConsumptionFrameRecord[] = [];
 
   try {
-    reports = await ConsumptionFrameModel.find({
-      $or: [{ sent: { $exists: false } }, { sent: { $eq: null } }],
+    reports = await ConsumptionFrame.findAll({
+      where: {
+        sent: {
+          [Op.not]: null,
+        },
+      },
     });
 
     console.log(`Found ${reports.length} unsent reports`);
@@ -48,14 +52,17 @@ export default async () => {
 
   // Update local report data
   const now = new Date();
-  const reportIds: Types.ObjectId[] = [];
-  for (const r of reports) reportIds.push(r._id);
+  const reportIds: number[] = [];
+  for (const r of reports) reportIds.push(r.id);
 
   try {
-    await ConsumptionFrameModel.updateMany(
-      { _id: { $in: reportIds } },
-      { sent: now }
+    // Loop through all the ids and update them with sent properties
+    await Promise.all(
+      reportIds.map(async (id) => {
+        await ConsumptionFrame.update({ sent: now }, { where: { id } });
+      })
     );
+    console.error("Frames updated successfully");
   } catch (err) {
     console.error("Could not update the consumption frames");
     return;
