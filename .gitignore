@@ -1,3 +1,6 @@
+# For old files
+.old/
+
 # Data folder for database data
 data/
 
