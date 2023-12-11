@@ -1,20 +1,17 @@
 services:
-  mongodb:
-    container_name: iotpc_mongodb
-    image: mongo:latest
-    command: mongod --auth
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: mongodb
-      MONGO_INITDB_ROOT_PASSWORD: mongodb
-      MONGO_INITDB_DATABASE: mongodb
-      MONGODB_DATA_DIR: /data/db/main
-      MONGODB_LOG_DIR: /dev/null
-    volumes:
-      - ./data/main:/data/db
+  postgres:
+    container_name: iotpc_postgres
+    image: postgres:16-alpine
     ports:
-      - 27017:27017
+      - 5432:5432
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=iotpc
+      - POSTGRES_USER=iotpc
+      - POSTGRES_DB=iotpc_db
     networks:
-      - mongodb
+      - postgres
 
   redis:
     container_name: iotpc_redis
@@ -30,15 +27,15 @@ services:
     build: ./daemon
     depends_on:
       - redis
-      - mongodb
+      - postgres
     volumes:
       - ./daemon:/app/daemon/
     networks:
       - redis
-      - mongodb
+      - postgres
 
 networks:
-  mongodb:
+  postgres:
     driver: bridge
   redis:
     driver: bridge
