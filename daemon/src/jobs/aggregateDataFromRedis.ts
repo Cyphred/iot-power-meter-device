@@ -1,9 +1,9 @@
 import dotenv from "dotenv";
-import { createClient } from "redis";
-import ConsumptionFrameModel, {
+import ConsumptionFrame, {
   IConsumptionFrame,
 } from "../models/consumptionFrame.js";
 import getRedisClient from "../util/getRedisClient.js";
+import sequelize from "../sequelize.js";
 
 dotenv.config();
 
@@ -44,19 +44,24 @@ export default async () => {
     parsedData
   );
 
-  try {
-    // Saves the frame records to the database
-    const frameRecords = await ConsumptionFrameModel.insertMany(frames);
-
-    console.log(
-      `Created ${frameRecords.length} records out of ${frames.length} frames`
-    );
-
-    // Delete the saved data from redis
-    await redisClient.del(keys);
-  } catch (err) {
-    console.error("Error saving consumption data to MongoDB");
-  }
+  // Saves the frame records to the database
+  sequelize
+    .sync()
+    .then(() => {
+      return ConsumptionFrame.bulkCreate(frames as any);
+    })
+    .then((createdFrames) => {
+      console.log(
+        `Created ${createdFrames.length} frames out of ${frames.length}.`
+      );
+    })
+    .catch((error) => {
+      console.error("Error ");
+    })
+    .finally(async () => {
+      // Delete the saved data from redis
+      await redisClient.del(keys);
+    });
 
   // Close the redis connection
   await redisClient.quit();
