@@ -3,6 +3,7 @@ import re
 import requests
 import time
 import json
+import redis
 
 json_config = open("/home/jeremy/iot-power-meter-device/config.json")
 config = json.load(json_config)
@@ -12,7 +13,12 @@ url = config['servers'][0]
 device_id = config['meterId']
 secret = config['secret']
 
-# TODO Connect to mongodb
+# Initialize connection with redis server
+redis_host="localhost"
+redis_port=6379
+print(f"Connecting to redis server at {redis_host}:{redis_port}")
+redis_server = redis.Redis(host=redis_host, port=redis_port, decode_responses=True)
+print("Connected to redis!")
 
 # Make sure it's the only ttyUSB device attached
 arduino_dev=None
@@ -39,26 +45,29 @@ arduino_buffer=""
 print(f"Connected to {arduino_dev}")
 
 # Updates the display on the arduino solution
-# TODO Fix this to directly use the LCD with the Orange Pi
-def update_display(online, power_cut, sensor_error, reading):
+def update_display(reading):
+  load_connected = redis_server.get("LOAD_CONNECTED")
+  server_online = redis_server.get("SERVER_ONLINE")
+  sensor_error = redis_server.get("SENSOR_ERROR")
+  
   try:
     write_buffer = ""
 
-    if online is True:
+    if server_online == "1":
       write_buffer += "1"
     else:
       write_buffer += "0"
     
     write_buffer += ","
 
-    if power_cut is True:
+    if load_connected == "1":
       write_buffer += "1"
     else:
       write_buffer += "0"
     
     write_buffer += ","
     
-    if sensor_error is True:
+    if sensor_error == "1":
       write_buffer += "1"
     else:
       write_buffer += "0"
@@ -81,15 +90,36 @@ power_cut = False
 sensor_error = False
 counter = 0.0
 
+# To flush the buffer
+line = arduino.readline().decode("utf-8")
+
+
 while True:
     try:
-      online = not online
-      power_cut = not power_cut
-      sensor_error = not sensor_error
-      counter += 1
+      # Read from serial
+      line = arduino.readline().decode("utf-8")
+      
+      # Strip the line of newline characters
+      stripped = line.rstrip("\r\n")
+      print(stripped)
 
-      update_display(online, power_cut, sensor_error, f"{counter}")
-      print("Sending update")
+      # Split the data
+      relay_on, watt_hours, amps = map(float, stripped.split(','))
+      
+      # Save to redis
+      timestamp = int(time.time())
+      redis_server.set(f"{device_id}:{timestamp}",watt_hours)
+    
+      # Update the current reading
+      total_watthours = None
+      try:
+        total_watthours = float(redis_server.get("TOTAL_WATTHOURS"))
+      except Exception as e:
+        total_watthours = 0
+
+      kilowatt_hours = total_watthours / 1000.0
+
+      update_display(kilowatt_hours)
       time.sleep(1)
     except KeyboardInterrupt:
         raise
