@@ -4,6 +4,7 @@ import setupRabbitMQ from "./rabbitmq/setup.js";
 import sendDataToServer from "./jobs/sendDataToServer.js";
 import aggregateDataFromRedis from "./jobs/aggregateDataFromRedis.js";
 import { scheduleJob } from "node-schedule";
+import ping from "./jobs/ping.js";
 
 // Loads .env data
 dotenv.config();
@@ -32,8 +33,11 @@ const startScheduledJobs = () => {
     sendDataToServer();
   });
 
+  const pingJob = scheduleJob("*/60 * * * * *", (fireDate) => ping());
+
   aggregateJob.invoke();
   sendJob.invoke();
+  pingJob.invoke();
 };
 
 startScheduledJobs();
