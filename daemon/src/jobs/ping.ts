@@ -18,13 +18,17 @@ export default async () => {
         sensorError: sensorError === "1" ? true : undefined,
         loadConnected: loadConnected === "1" ? true : false,
       },
-      { headers: { Authorization: process.env.METER_SECRET } }
+      {
+        headers: {
+          Authorization: `${process.env.METER_ID}:${process.env.METER_SECRET}`,
+        },
+      }
     );
 
     const responseData = response.data as IApiResponse;
 
     let connected = 0;
-    if (responseData.status === 200) connected = 1;
+    if (!responseData.errorCode && responseData.status === 200) connected = 1;
 
     // If the load is supposed to be disconnected
     if (responseData.body && responseData.body.loadConnected === false) {

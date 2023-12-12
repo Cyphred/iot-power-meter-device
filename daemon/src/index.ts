@@ -51,7 +51,7 @@ const startScheduledJobs = () => {
     sendDataToServer();
   });
 
-  const pingJob = scheduleJob("*/60 * * * * *", (fireDate) => ping());
+  const pingJob = scheduleJob("*/20 * * * * *", (fireDate) => ping());
 
   aggregateJob.invoke();
   sendJob.invoke();
