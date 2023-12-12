@@ -4,6 +4,7 @@ import aggregateDataFromRedis from "./jobs/aggregateDataFromRedis.js";
 import { scheduleJob } from "node-schedule";
 import ping from "./jobs/ping.js";
 import getRedisClient from "./util/getRedisClient.js";
+import sequelize from "./sequelize.js";
 
 // Loads .env data
 dotenv.config();
@@ -20,6 +21,12 @@ console.log("Port:", dbPort);
 console.log("Database:", dbName);
 console.log("User:", dbUser);
 console.log("Password:", dbPassword);
+
+// Sync models
+console.log("Authenticating db connection...");
+await sequelize.authenticate();
+console.log("Creating models...");
+await sequelize.sync();
 
 // Check if secret is present in env
 const secret = process.env.METER_SECRET;
