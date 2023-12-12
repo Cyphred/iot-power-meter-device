@@ -1,15 +1,14 @@
 import serial
 import time
-import json
 import redis
 
-json_config = open("/home/jeremy/iot-power-meter-device/config.json")
-config = json.load(json_config)
-
-# Device-specific settings
-url = config['servers'][0]
-device_id = config['meterId']
-secret = config['secret']
+### DEVICE-SPECIFIC SETTINGS
+# Change this to the api's url
+url = 'http://192.168.1.10:8000/api' 
+# Change this if using multiple meters
+device_id = '1'
+# Change this to something more secure
+secret = 'iotpc'
 
 # Initialize connection with redis server
 redis_host="localhost"
