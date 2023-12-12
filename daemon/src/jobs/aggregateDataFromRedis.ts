@@ -33,7 +33,6 @@ export default async () => {
   const parsedData: IParsedData[] = [];
   for (const value of rawData) {
     const parsed = JSON.parse(value) as IRawData;
-
     parsedData.push({
       timestamp: new Date(parsed.timestamp),
       wattage: parsed.wattage,
@@ -46,26 +45,21 @@ export default async () => {
 
   // Saves the frame records to the database
   console.log(`Saving ${frames.length} frames to the database`);
-  sequelize
-    .sync()
-    .then(() => {
-      return ConsumptionFrame.bulkCreate(frames as any);
-    })
-    .then((createdFrames) => {
-      console.log(
-        `Created ${createdFrames.length} frames out of ${frames.length}.`
-      );
-    })
-    .catch((error) => {
-      console.error("Error ");
-    })
-    .finally(async () => {
-      // Delete the saved data from redis
-      await redisClient.del(keys);
-    });
 
-  // Close the redis connection
-  await redisClient.quit();
+  try {
+    const frameRecords = await ConsumptionFrame.bulkCreate(frames);
+    console.log(
+      `Created ${frameRecords.length} frames out of ${frames.length}.`
+    );
+
+    // Delete the saved data from redis
+    await redisClient.del(keys);
+  } catch (err) {
+    console.error(err);
+  } finally {
+    // Close the redis connection
+    await redisClient.quit();
+  }
 };
 
 const convertToConsumptionFrames = async (parsedData: IParsedData[]) => {
