@@ -94,17 +94,22 @@ void loop() {
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print(kwhReading);
-    lcd.print(" KWH / ");
-    lcd.print(ampReading);
-    lcd.print('A');
 
     lcd.setCursor(0, 1);
-    if (!online)
-      lcd.print("OFF ");
-    if (cut)
-      lcd.print("DISC ");
-    if (sensorError)
-      lcd.print("ERR ");
+    lcd.print(ampReading);
+    
+    if (!online) {
+      lcd.setCursor(13,1);
+      lcd.print("O");
+    }
+    if (cut) {
+      lcd.setCursor(14,1);
+      lcd.print("D");
+    }
+    if (sensorError) {
+      lcd.setCursor(15,1);
+      lcd.print("E");
+    }
   }
 
   if (waitingForPi)
