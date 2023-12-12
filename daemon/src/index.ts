@@ -8,6 +8,19 @@ import getRedisClient from "./util/getRedisClient.js";
 // Loads .env data
 dotenv.config();
 
+const dbHost = process.env.POSTGRES_HOST;
+const dbName = process.env.POSTGRES_NAME;
+const dbUser = process.env.POSTGRES_USER;
+const dbPassword = process.env.POSTGRES_PASS;
+const dbPort = process.env.POSTGRES_PORT;
+
+console.log("Starting with DB config:");
+console.log("Host:", dbHost);
+console.log("Port:", dbPort);
+console.log("Database:", dbName);
+console.log("User:", dbUser);
+console.log("Password:", dbPassword);
+
 // Check if secret is present in env
 const secret = process.env.METER_SECRET;
 if (!secret) throw new Error("Meter secret not defined in .env");
