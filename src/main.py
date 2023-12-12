@@ -82,9 +82,6 @@ def update_display(reading):
   except Exception as e:
     print(f"An exception occured: {e}")
 
-# To flush the buffer
-line = arduino.readline().decode("utf-8")
-
 # Send initial values
 update_display("0.0")
 
