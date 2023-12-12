@@ -15,7 +15,7 @@ const dbPassword = process.env.POSTGRES_PASS;
 const sequelize = new Sequelize(dbName, dbUser, dbPassword, {
   host: dbHost,
   port: dbPort,
-  dialect: "mysql",
+  dialect: "postgres",
   define: { timestamps: true },
 });
 
