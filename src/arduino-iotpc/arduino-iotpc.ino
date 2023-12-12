@@ -38,7 +38,7 @@ void setRelay(bool state) {
 // Set the LCD address to 0x3F for a 16 chars and 2 line display
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
-String reading;
+String kwhReading, ampReading;
 boolean online = false;
 boolean cut = false;
 boolean sensorError = false;
@@ -73,13 +73,17 @@ void loop() {
     int comma1 = input.indexOf(',');
     int comma2 = input.indexOf(',', comma1 + 1);
     int comma3 = input.indexOf(',', comma2 + 1);
+    int comma4 = input.indexOf(',', comma3 + 1);
 
-    if (comma1 != -1 && comma2 != -1 && comma3 != -1) {
+    if (comma1 != -1 && comma2 != -1 && comma3 != -1 && comma4 != -1) {
       // Extract values from the input line
       int firstValue = input.substring(0, comma1).toInt();
       int secondValue = input.substring(comma1 + 1, comma2).toInt();
-      int thirdValue = input.substring(comma2 + 1, comma3).toInt();
-      reading = input.substring(comma3 + 1);
+      float thirdValue = input.substring(comma2 + 1, comma3).toFloat();
+      float fourthValue = input.substring(comma3 + 1, comma4).toFloat();
+
+      kwhReading = input.substring(comma3 + 1);
+      ampReading = input.substring(comma4 + 1);
 
       // Set variables based on the parsed values
       online = (firstValue == 1);
@@ -90,8 +94,10 @@ void loop() {
     // Display values on the LCD
     lcd.clear();
     lcd.setCursor(0, 0);
-    lcd.print(reading);
-    lcd.print(" KWH");
+    lcd.print(kwhReading);
+    lcd.print(" KWH / ");
+    lcd.print(ampReading);
+    lcd.print('A');
 
     lcd.setCursor(0, 1);
     if (!online)
