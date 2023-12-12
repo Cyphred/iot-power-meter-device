@@ -32,7 +32,7 @@ export default async () => {
   // Parse the raw data as json objects
   const parsedData: IParsedData[] = [];
   for (const value of rawData) {
-    const parsed = JSON.parse(value) as IRawData;
+    const parsed = JSON.parse(value.replace(/'/g, '"')) as IRawData;
     parsedData.push({
       timestamp: new Date(parsed.timestamp),
       wattage: parsed.wattage,
