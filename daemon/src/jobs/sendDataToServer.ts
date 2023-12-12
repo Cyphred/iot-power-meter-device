@@ -4,7 +4,6 @@ import ConsumptionFrame, {
 } from "../models/consumptionFrame.js";
 import dotenv from "dotenv";
 import getRedisClient from "../util/getRedisClient.js";
-import { Op } from "sequelize";
 
 dotenv.config();
 
@@ -31,6 +30,7 @@ export default async () => {
   }
 
   // Send report data to the backend
+  const redisClient = await getRedisClient();
   try {
     console.log("Sending reports to server...");
     const response = await axios.post(
@@ -48,8 +48,10 @@ export default async () => {
       const errorCode = response.data.errorCode as string;
       throw new Error(`${errorCode}: ${message}`);
     }
+
+    await redisClient.set("SERVER_ONLINE", 1);
+    await redisClient.quit();
   } catch (err) {
-    const redisClient = await getRedisClient();
     await redisClient.set("SERVER_ONLINE", 0);
     await redisClient.quit();
     console.error("Could not send reports to the server");
