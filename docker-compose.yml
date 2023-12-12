@@ -12,6 +12,7 @@ services:
       - POSTGRES_DB=iotpc_db
     networks:
       - postgres
+    command: ["postgres", "-c", "listen_addresses=*"]
 
   redis:
     container_name: iotpc_redis
