@@ -21,7 +21,7 @@ export default async () => {
   const redisClient = await getRedisClient();
 
   // Store the keys of the data
-  const keys = await redisClient.keys("key:*");
+  const keys = await redisClient.keys("consumption:*");
 
   // Do not proceed if there is no data to store
   if (!keys.length) return;
@@ -45,6 +45,7 @@ export default async () => {
   );
 
   // Saves the frame records to the database
+  console.log(`Saving ${frames.length} frames to the database`);
   sequelize
     .sync()
     .then(() => {
