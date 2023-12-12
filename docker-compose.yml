@@ -13,6 +13,7 @@ services:
     networks:
       - postgres
     command: ["postgres", "-c", "listen_addresses=*"]
+    profiles: ["live", "dev"]
 
   redis:
     container_name: iotpc_redis
@@ -22,6 +23,7 @@ services:
       - 8801:8001 # RedisInsight
     networks:
       - redis
+    profiles: ["dev"]
 
   main:
     container_name: iotpc_daemon
@@ -34,6 +36,7 @@ services:
     networks:
       - redis
       - postgres
+    profiles: ["dev"]
 
 networks:
   postgres:
