@@ -103,9 +103,14 @@ while True:
       # Split the data
       relay_on, watt_hours, amps = map(float, stripped.split(','))
       
+      payload = {
+        "timestamp": timestamp,
+        "wattage": watt_hours
+      }
+      
       # Save to redis
       timestamp = int(time.time())
-      redis_server.set(f"{device_id}:{timestamp}",watt_hours)
+      redis_server.set(f"consumption:{timestamp}", f"{payload}")
     
       # Update the current reading
       total_watthours = None
