@@ -98,6 +98,8 @@ while True:
       # Split the data
       relay_on, watt_hours, amps = map(float, stripped.split(','))
       
+      timestamp = time.time()
+      
       payload = {
         "timestamp": timestamp,
         "wattage": watt_hours
