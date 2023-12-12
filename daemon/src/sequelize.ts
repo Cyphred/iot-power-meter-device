@@ -5,7 +5,7 @@ import { Sequelize } from "sequelize";
 
 let dbPort = parseInt(process.env.POSTGRES_PORT);
 // Defaults to 3306
-if (isNaN(dbPort)) dbPort = 3306;
+if (isNaN(dbPort)) dbPort = 5347;
 
 const dbHost = process.env.POSTGRES_HOST;
 const dbName = process.env.POSTGRES_NAME;
