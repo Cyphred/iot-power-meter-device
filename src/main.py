@@ -71,7 +71,7 @@ def update_display(reading):
     
     write_buffer += ","
     
-    write_buffer += reading
+    write_buffer += f"{reading} KWH"
 
     # Write to serial only if buffer is not empty
     if write_buffer != "":
@@ -84,7 +84,7 @@ def update_display(reading):
 
 # Send initial values
 time.sleep(5)
-update_display("0.0")
+update_display(0.0)
 
 while True:
     try:
@@ -111,7 +111,7 @@ while True:
         kwh_reading = float(redis_server.get("KWH_READING"))
         update_display(kwh_reading)
       except Exception as e:
-        update_display("0.0")
+        update_display(0.0)
 
       time.sleep(1)
     except KeyboardInterrupt:
