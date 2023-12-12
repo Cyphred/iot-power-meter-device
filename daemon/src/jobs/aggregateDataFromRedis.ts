@@ -76,8 +76,8 @@ const convertToConsumptionFrames = async (parsedData: IParsedData[]) => {
   const frames: IConsumptionFrame[] = [];
 
   while (queue.length) {
-    const start = queue[0].timestamp;
-    const startTime = start.getTime();
+    const startDate = queue[0].timestamp;
+    const startTime = startDate.getTime();
 
     let lastIndex = 0;
     const withinResolution: IParsedData[] = [];
@@ -97,19 +97,21 @@ const convertToConsumptionFrames = async (parsedData: IParsedData[]) => {
     // Remove the filtered items from the queue
     queue = queue.slice(0, lastIndex);
 
-    // Determine the ending timestamp
-    const end = withinResolution.slice(-1)[0].timestamp;
-
     // Compute the consumption by averaging the data points
-    let consumption: number = 0;
+    let consumption = 0;
+
     for (const data of withinResolution) {
       consumption += data.wattage;
     }
-    consumption /= withinResolution.length;
+
+    // Converts the watt hours into kilowatt hours
+    consumption /= 1000.0;
+
+    const endDate = withinResolution.slice(-1)[0].timestamp;
 
     frames.push({
-      start,
-      end,
+      start: startDate,
+      end: endDate,
       consumption,
     });
   }
