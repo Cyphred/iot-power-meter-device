@@ -73,16 +73,14 @@ void loop() {
     int comma1 = input.indexOf(',');
     int comma2 = input.indexOf(',', comma1 + 1);
     int comma3 = input.indexOf(',', comma2 + 1);
-    int comma4 = input.indexOf(',', comma3 + 1);
 
-    if (comma1 != -1 && comma2 != -1 && comma3 != -1 && comma4 != -1) {
+    if (comma1 != -1 && comma2 != -1 && comma3 != -1) {
       // Extract values from the input line
       int firstValue = input.substring(0, comma1).toInt();
       int secondValue = input.substring(comma1 + 1, comma2).toInt();
       int thirdValue = input.substring(comma2 + 1, comma3).toInt();
 
-      kwhReading = input.substring(comma3 + 1, comma4);
-      ampReading = input.substring(comma4 + 1);
+      kwhReading = input.substring(comma3 + 1);
 
       // Set variables based on the parsed values
       online = (firstValue == 1);
@@ -96,18 +94,19 @@ void loop() {
     lcd.print(kwhReading);
 
     lcd.setCursor(0, 1);
-    lcd.print(ampReading);
-    
+    lcd.print(RMSCurrent);
+    lcd.print('A ');
+
     if (!online) {
-      lcd.setCursor(13,1);
+      lcd.setCursor(13, 1);
       lcd.print("O");
     }
     if (cut) {
-      lcd.setCursor(14,1);
+      lcd.setCursor(14, 1);
       lcd.print("D");
     }
     if (sensorError) {
-      lcd.setCursor(15,1);
+      lcd.setCursor(15, 1);
       lcd.print("E");
     }
   }
