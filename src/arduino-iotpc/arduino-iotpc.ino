@@ -81,7 +81,7 @@ void loop() {
       int secondValue = input.substring(comma1 + 1, comma2).toInt();
       int thirdValue = input.substring(comma2 + 1, comma3).toInt();
 
-      kwhReading = input.substring(comma3 + 1);
+      kwhReading = input.substring(comma3 + 1, comma4);
       ampReading = input.substring(comma4 + 1);
 
       // Set variables based on the parsed values
