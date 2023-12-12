@@ -79,8 +79,7 @@ void loop() {
       // Extract values from the input line
       int firstValue = input.substring(0, comma1).toInt();
       int secondValue = input.substring(comma1 + 1, comma2).toInt();
-      float thirdValue = input.substring(comma2 + 1, comma3).toFloat();
-      float fourthValue = input.substring(comma3 + 1, comma4).toFloat();
+      int thirdValue = input.substring(comma2 + 1, comma3).toInt();
 
       kwhReading = input.substring(comma3 + 1);
       ampReading = input.substring(comma4 + 1);
