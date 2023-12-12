@@ -110,16 +110,12 @@ while True:
       timestamp = int(time.time())
       redis_server.set(f"consumption:{timestamp}", f"{payload}")
     
-      # Update the current reading
-      total_watthours = None
       try:
-        total_watthours = float(redis_server.get("TOTAL_WATTHOURS"))
+        kwh_reading = float(redis_server.get("KWH_READING"))
+        update_display(kwh_reading)
       except Exception as e:
-        total_watthours = 0
+        update_display("0.0")
 
-      kilowatt_hours = total_watthours / 1000.0
-
-      update_display(kilowatt_hours)
       time.sleep(1)
     except KeyboardInterrupt:
         raise
