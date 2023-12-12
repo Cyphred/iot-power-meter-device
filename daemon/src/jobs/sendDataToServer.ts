@@ -15,11 +15,7 @@ export default async () => {
 
   try {
     reports = await ConsumptionFrame.findAll({
-      where: {
-        sent: {
-          [Op.not]: null,
-        },
-      },
+      where: { sent: null },
     });
 
     console.log(`Found ${reports.length} unsent reports`);
@@ -37,16 +33,27 @@ export default async () => {
   // Send report data to the backend
   try {
     console.log("Sending reports to server...");
-    await axios.post(
+    const response = await axios.post(
       `${process.env.REPORTS_URI}`,
       { reports },
-      { headers: { Authorization: process.env.METER_SECRET } }
+      {
+        headers: {
+          Authorization: `${process.env.METER_ID}:${process.env.METER_SECRET}`,
+        },
+      }
     );
+
+    if (response.data.errorCode) {
+      const message = response.data.message as string;
+      const errorCode = response.data.errorCode as string;
+      throw new Error(`${errorCode}: ${message}`);
+    }
   } catch (err) {
     const redisClient = await getRedisClient();
     await redisClient.set("SERVER_ONLINE", 0);
     await redisClient.quit();
     console.error("Could not send reports to the server");
+    console.error(err.message);
     return;
   }
 
