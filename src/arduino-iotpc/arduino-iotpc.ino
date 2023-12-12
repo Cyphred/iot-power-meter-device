@@ -143,6 +143,10 @@ void readCurrent() {
   // With line added TIME 33 , SECONDS:11 with this in                      #
   // with the line RMS current highlighted out TIME 197 , SECONDS:11        #
   // #########################################################################
+  
+  // Bit of a hack, gets rid of ghost readings
+  if (RMSCurrent < 0.30) RMSCurrent = 0;
+
   RMSPower = 240.0 * RMSCurrent;    // Calculates RMS Power Assuming Voltage
                                     // 220VAC, change to 110VAC accordingly  #
   time++;                           // increase the time
