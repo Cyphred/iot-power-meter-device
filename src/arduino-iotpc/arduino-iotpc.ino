@@ -3,7 +3,7 @@
 
 #define RELAY_PIN A1
 #define SCT_PIN A0
-#define CURRENT_CAL 45.633 // Calculated and calibrated
+#define CURRENT_CAL 43.75 // Calculated and calibrated
 
 EnergyMonitor emon1;
 float kilos = 0;
