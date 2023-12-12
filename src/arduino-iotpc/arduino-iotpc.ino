@@ -3,7 +3,7 @@
 
 #define RELAY_PIN A1
 #define SCT_PIN A0
-#define CURRENT_CAL 58.633 // Calculated and calibrated
+#define CURRENT_CAL 45.633 // Calculated and calibrated
 
 EnergyMonitor emon1;
 float kilos = 0;
@@ -88,27 +88,7 @@ void loop() {
       sensorError = (thirdValue == 1);
     }
 
-    // Display values on the LCD
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print(kwhReading);
-
-    lcd.setCursor(0, 1);
-    lcd.print(RMSCurrent);
-    lcd.print('A ');
-
-    if (!online) {
-      lcd.setCursor(13, 1);
-      lcd.print("O");
-    }
-    if (cut) {
-      lcd.setCursor(14, 1);
-      lcd.print("D");
-    }
-    if (sensorError) {
-      lcd.setCursor(15, 1);
-      lcd.print("E");
-    }
+    printScreen();
   }
 
   if (waitingForPi)
@@ -119,14 +99,40 @@ void loop() {
   Serial.print(',');
   Serial.print(kilos); // Sends the watt hours reading via serial
   Serial.print(',');
-  Serial.print(RMSCurrent); // Sends the current reading via serial
+  Serial.print(RMSCurrent, 2); // Sends the current reading via serial
   Serial.println();
+
+  printScreen();
 
   // Update relay cut state
   if (cut && relayOn == true) {
     setRelay(false);
   } else if (!cut && relayOn == false) {
     setRelay(true);
+  }
+}
+
+void printScreen() {
+  // Display values on the LCD
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print(kwhReading);
+
+  lcd.setCursor(0, 1);
+  lcd.print(double(RMSCurrent));
+  lcd.print("A ");
+
+  if (!online) {
+    lcd.setCursor(13, 1);
+    lcd.print("O");
+  }
+  if (cut) {
+    lcd.setCursor(14, 1);
+    lcd.print("D");
+  }
+  if (sensorError) {
+    lcd.setCursor(15, 1);
+    lcd.print("E");
   }
 }
 
