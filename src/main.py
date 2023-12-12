@@ -83,6 +83,7 @@ def update_display(reading):
     print(f"An exception occured: {e}")
 
 # Send initial values
+time.sleep(5)
 update_display("0.0")
 
 while True:
