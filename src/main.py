@@ -100,6 +100,9 @@ while True:
       
       timestamp = time.time()
       
+      # Save amp data now
+      redis_server.set(f"AMPS_NOW", amps)
+      
       payload = {
         "timestamp": timestamp,
         "wattage": watt_hours
