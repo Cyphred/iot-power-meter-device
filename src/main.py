@@ -1,10 +1,12 @@
 import serial
 import time
 import redis
+import requests
+import json
 
 ### DEVICE-SPECIFIC SETTINGS
 # Change this to the api's url
-url = 'http://192.168.1.10:8000/api' 
+url = 'http://192.168.1.100:8000/api' 
 # Change this if using multiple meters
 device_id = '1'
 # Change this to something more secure
@@ -40,6 +42,39 @@ if not arduino:
 arduino_buffer=""
 
 print(f"Connected to {arduino_dev}")
+
+def send_to_server(amps,watthour):
+  payload = {
+    'currentNow': amps,
+    'watthourNow': watthour,
+    'sensorError': False
+  }
+
+  headers = {
+    'authorization': f'{device_id}:{secret}',
+    'Content-Type': 'application/json'
+  }
+
+  try:
+    res = requests.post(f'{url}/meter/ping', headers=headers, data=json.dumps(payload))
+
+    if res.status_code == 200:
+        redis_server.set("SERVER_ONLINE", 1)
+
+    res_json = res.json()
+
+    print(res_json)
+
+    if res_json['body']['subscriberDisconnect'] == True:
+        redis_server.set("LOAD_CONNECTED", 1)
+    else:
+        redis_server.set("LOAD_CONNECTED", 0)
+
+    redis_server.set("KWH_READING", res_json['body']['kwhSinceCutoff'])
+  except Exception as e:
+    redis_server.set("SERVER_ONLINE",0)
+    print(e)
+
 
 # Updates the display on the arduino solution
 def update_display(reading):
@@ -83,7 +118,7 @@ def update_display(reading):
     print(f"An exception occured: {e}")
 
 # Send initial values
-time.sleep(5)
+time.sleep(2)
 update_display(0.0)
 
 while True:
@@ -97,6 +132,8 @@ while True:
 
       # Split the data
       relay_on, watt_hours, amps = map(float, stripped.split(','))
+      
+      send_to_server(amps, watt_hours)
       
       timestamp = time.time()
       
@@ -115,6 +152,7 @@ while True:
       try:
         kwh_reading = float(redis_server.get("KWH_READING"))
         update_display(kwh_reading)
+        print(kwh_reading)
       except Exception as e:
         update_display(0.0)
 
