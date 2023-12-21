@@ -68,6 +68,8 @@ void setup() {
   lcd.clear();
   lcd.backlight();
 
+  Serial.begin(115200);
+
   pinMode(RELAY_PIN, OUTPUT);
   setRelay(false);
 
@@ -79,10 +81,18 @@ void setup() {
   lcd.print("Connecting to");
   lcd.setCursor(0, 1);
   lcd.print("WiFi...");
+  
+  // Print statements in setup seems to prevent
+  // a weird boot-loop
+  Serial.print("Connecting to");
+  Serial.print(ssid);
 
   while(WiFi.status() != WL_CONNECTED) {
     delay(500);
+    Serial.print('.');
   }
+
+  Serial.println("Connected!");
 
   lcd.clear();
   lcd.setCursor(0,0);
@@ -91,8 +101,6 @@ void setup() {
   lcd.print(WiFi.localIP());
   
   delay(1000);
-
-  Serial.begin(115200);
 }
 
 void loop() {
