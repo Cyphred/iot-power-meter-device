@@ -6,7 +6,7 @@
 #include <ESP8266HTTPClient.h>
 #include <WiFiClient.h>
 
-#define RELAY_PIN A0
+#define RELAY_PIN 13
 #define SCT_PIN A0
 #define CURRENT_CAL 40.25 // Calculated and calibrated
 
